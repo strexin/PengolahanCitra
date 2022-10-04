@@ -1,0 +1,97 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Edge Detection</title>
+</head>
+
+<body>
+    <canvas id='canvas1'></canvas></div>
+    <canvas id='canvas2'></canvas></div>
+    <hr>
+
+    <button id='read'>READ IMAGE</button></div>
+    <button id='ori'>ORIGINAL IMAGE</button></div>
+    <hr>
+
+    <button id='sobel'>Sobel</button></div>
+    <button id='prewitt'>Prewitt</button></div>
+    <hr>
+
+</body>
+
+<style>
+    body {
+        font-family: sans-serif;
+        background: rgb(253, 253, 253);
+    }
+</style>
+<script src='pc.js'></script>
+<script>
+    var canvas = document.getElementById('canvas1')//canvas 1 untuk gambar yang belum di read
+    var obj = new pc(canvas)//membuat objek canvas
+    obj.image2canvas("gabung.jpg")//file gambar yang digunakan
+    var canvas2 = document.getElementById('canvas2')//canvas 2 untuk gambar yang sudah di read
+    var obj2 = new pc(canvas2)//membuat objek canvas 2
+    obj2.blank2canvas(120, 120)//ukuran canvas
+    var tes = new Array()//membuat array
+
+    document.getElementById('read').addEventListener('click', function() {//berfungsi membaca gambar sebelum diberi filter
+        tes = obj.image2read()//membaca gambar
+    })
+
+    document.getElementById('ori').addEventListener('click', function() {//mengembalikan gambar ke semula (original)
+        obj.image2original()//mengembalikan gambar
+    })
+
+    document.getElementById('sobel').addEventListener('click',function(){
+      var Gxtemp = new Array(4)
+      var Gytemp = new Array(4)
+      var G = new Array()
+      var xpos = 0;
+      var ypos = 0;
+      function cek(x,y,n){
+        if(y>=0 && x>=0 && x<obj.width && y<obj.height) return parseInt(tes[obj.xy2i(x,y)])
+        else return 0
+      }
+      for(var i=0; i<tes.length; i++){
+        var Gtemp = new Array(4)
+        xpos = obj.i2x(i)
+        ypos = obj.i2y(i)
+        for(var j=0; j<3; j++){
+          Gxtemp[j] = (cek(xpos-1,ypos-1)*-1) + (cek(xpos-1,ypos)*-2) + (cek(xpos-1,ypos+1)*-1) + (cek(xpos+1,ypos-1)) + (cek(xpos+1,ypos)*2) + (cek(xpos+1,ypos+1))
+          Gytemp[j] = (cek(xpos-1,ypos-1)*-1) + (cek(xpos,ypos-1)*-2) + (cek(xpos+1,ypos-1)*-1) + (cek(xpos-1,ypos+1)) + (cek(xpos,ypos+1)*2) + (cek(xpos+1,ypos+1))
+          Gtemp[j] = Math.floor(Math.sqrt((parseInt(Gxtemp[j])*parseInt(Gxtemp[j])) + (parseInt(Gytemp[j])*parseInt(Gytemp[j]))))
+        }
+        Gtemp[3] = tes[i][3]
+        G.push(Gtemp)
+      }
+      obj.array2canvas(G)
+    })
+
+    document.getElementById('prewitt').addEventListener('click',function(){
+      var Gxtemp = new Array(4)
+      var Gytemp = new Array(4)
+      var G = new Array()
+      var xpos = 0;
+      var ypos = 0;
+      function cek(x,y,n){
+        if(y>=0 && x>=0 && x<obj.width && y<obj.height) return parseInt(tes[obj.xy2i(x,y)])
+        else return 0
+      }
+      for(var i=0; i<tes.length; i++){
+        var Gtemp = new Array(4)
+        xpos = obj.i2x(i)
+        ypos = obj.i2y(i)
+        for(var j=0; j<3; j++){
+          Gxtemp[j] = (cek(xpos-1,ypos-1)*-1) + (cek(xpos-1,ypos)*-1) + (cek(xpos-1,ypos+1)*-1) + (cek(xpos+1,ypos-1)) + (cek(xpos+1,ypos)) + (cek(xpos+1,ypos+1))
+          Gytemp[j] = (cek(xpos-1,ypos-1)*-1) + (cek(xpos,ypos-1)*-1) + (cek(xpos+1,ypos-1)*-1) + (cek(xpos-1,ypos+1)) + (cek(xpos,ypos+1)) + (cek(xpos+1,ypos+1))
+          Gtemp[j] = Math.floor(Math.sqrt((parseInt(Gxtemp[j])*parseInt(Gxtemp[j])) + (parseInt(Gytemp[j])*parseInt(Gytemp[j]))))
+        }
+        Gtemp[3] = tes[i][3]
+        G.push(Gtemp)
+      }
+      obj.array2canvas(G)
+    })
+
+</script>
